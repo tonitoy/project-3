@@ -1,17 +1,34 @@
-from urllib.request import urlretrieve
+# https://s3.amazonaws.com/tcmg476/http_access_log
 
-URL_PATH = 'https://s3.amazonaws.com/tcmg476/http_access_log'
-LOCAL_FILE = 'local_copy.log'
+#Questions (Output to screen)
+# How many total requests were made in the time period represented in the log?
+# How many requests were made on each day? per week? per month?
+# What percentage of the requests were not successful (any 4xx status code)?
+# What percentage of the requests were redirected elsewhere (any 3xx codes)?
+# What was the most-requested file?
+# What was the least-requested file?
 
-# Use urlretrieve() to fetch a remote copy and save into the local file path
-local_file, headers = urlretrieve(URL_PATH, LOCAL_FILE)
+# Logs should be broken into separate files by month 
+# Write the 12 files to this directory (~/Desktop/Project3)
 
-# Alt.: supply an anonmymous callback function to print a simple progress bar to screen
-local_file, headers = urlretrieve(URL_PATH, LOCAL_FILE, lambda x,y,z: print('.', end='', flush=True))
+import urllib.request #downloading a file over the internet
+import re #regular expressions
+from pathlib import Path
+import operator
 
-# Alt. 2: a progress bar with reduced output (every 1000 blocks)
-local_file, headers = urlretrieve(URL_PATH, LOCAL_FILE, lambda x,y,z: print('.', end='', flush=True) if x % 100 == 0 else False)
 
+log_url = 'https://s3.amazonaws.com/tcmg476/http_access_log'
+local_log_file = Path("logfile.txt")
+
+# Retrieve File (below). I have already downloaded it :) add a conditional to check for logfile.txt so we don't have to get it every time.
+# urllib.request.urlretrieve(log_url, 'logfile.txt')
+if local_log_file.is_file():
+    #file exists
+    print("Log file exists!\n")
+else: #file does not exist
+    print("Downloading log file now!\n")
+    urllib.request.urlretrieve(log_url, 'logfile.txt')
+    
 SELECT a.cs-uri-stem, COUNT(*) as total-requests, b.all-requests
 FROM long_running_pages AS a
 JOIN all_pages_grouped b ON ( a.cs-uri-stem = b.cs-uri-stem)
