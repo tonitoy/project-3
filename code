@@ -33,4 +33,64 @@ SELECT a.cs-uri-stem, COUNT(*) as total-requests, b.all-requests
 FROM long_running_pages AS a
 JOIN all_pages_grouped b ON ( a.cs-uri-stem = b.cs-uri-stem)
 GROUP BY a.cs-uri-stem
+ 
+ #new new
 
+import urllib2  # the lib that handles the url stuff
+
+count =0
+data = urllib2.urlopen('https://s3.amazonaws.com/tcmg476/http_access_log') # it's a file like object and works just like a file
+datecount = {} #Dictionary to store the count for every date
+monthcount = {} #Dictionary to store the count for every month
+errorcount=0
+newcount=0
+for line in data: 
+    #Example of one line
+    #'local - - [25/Oct/1994:10:08:07 -0600] "GET index.html HTTP/1.0" 200 3185\n'
+    
+	#CODE FOR #2
+    count+=1
+    left=line.find('[')
+    right=line.find(':')
+    date=line[left+1:right]
+    if not date[0].isdigit(): #Something wrong with this line
+        continue #skip
+    if not date in datecount.keys():
+        datecount[date]=1 #Set initial value
+    else:
+        datecount[date]+=1 #Increment value
+
+    datewords=date.split('/')
+    try:
+        month=datewords[1]
+        if not month in monthcount.keys():
+            monthcount[month]=1 #Set initial value
+        else:
+            monthcount[month]+=1 #Increment value
+    except:
+        continue
+		
+	 #CODE FOR #3 AND #4
+    words=line.split()
+    try:
+        code=int(words[-2])
+        if code>=400 and code<500:
+            errorcount+=1
+        if code>=300 and code<400:
+            newcount+=1
+    except:
+        continue
+		
+	
+ #ANSWERING #1  
+print('total requests = {}'.format(count)) #for taking the amount of lines in logfile
+
+#ANSWERING #2
+#for date in datecount.keys():
+    #print('total for {} = {}'.format(date,datecount[date]))
+#for month in monthcount.keys():
+    #print('total for {} = {}'.format(month,monthcount[month]))
+
+#ANSWERING #3 AND #4
+print 'Amount of Sucessful Requests: ', errorcount
+print 'Amount of Unsucessful Requests: ', newcount
