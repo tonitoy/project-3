@@ -38,6 +38,8 @@
  #new new
 
 import urllib2  # the lib that handles the url stuff
+import re
+from collections import Counter
 
 count =0
 data = urllib2.urlopen('https://s3.amazonaws.com/tcmg476/http_access_log') # it's a file like object and works just like a file
@@ -82,24 +84,21 @@ for line in data:
     except:
         continue
 		
-#5
-clean_log=[]
+#5 & 6 sorta
+mydata = data.read()
+words = (re.findall(r'"(.*?)"', mydata))
+c = Counter(words)
+request_count = c.most_common(1)
+request_count = request_count[0]
+request = request_count[0]
+print("maximum no of requests: ", request)
 
-for line in logfile:
-    try:
-        # copy the URLS to an empty list.
-        # We get the part between GET and HTTP
-        clean_log.append(line[line.index("GET")+4:line.index("HTTP")])
-    except:
-        pass
-
-counter = collections.Counter(clean_log)
-
+#counter = collections.Counter(clean_log)
 #get the most popular 
-for count in counter.most_common(1):
-    print(str(count[1]) + "	" + str(count[0]))
+#for count in counter.most_common(1):
+ #   print(str(count[1]) + "	" + str(count[0]))
 
-logfile.close()
+#logfile.close()
 	
  #ANSWERING #1  
 print('total requests = {}'.format(count)) #for taking the amount of lines in logfile
