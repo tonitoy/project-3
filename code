@@ -11,28 +11,29 @@
 # Logs should be broken into separate files by month 
 # Write the 12 files to this directory (~/Desktop/Project3)
 
-import urllib.request #downloading a file over the internet
-import re #regular expressions
-from pathlib import Path
-import operator
+#import urllib.request #downloading a file over the internet
+#import re #regular expressions
+#from pathlib import Path
+#import operator
 
 
-log_url = 'https://s3.amazonaws.com/tcmg476/http_access_log'
-local_log_file = Path("logfile.txt")
+#log_url = 'https://s3.amazonaws.com/tcmg476/http_access_log'
+#local_log_file = Path("logfile.txt")
 
 # Retrieve File (below). I have already downloaded it :) add a conditional to check for logfile.txt so we don't have to get it every time.
 # urllib.request.urlretrieve(log_url, 'logfile.txt')
-if local_log_file.is_file():
+#if local_log_file.is_file():
     #file exists
-    print("Log file exists!\n")
-else: #file does not exist
-    print("Downloading log file now!\n")
-    urllib.request.urlretrieve(log_url, 'logfile.txt')
+ #   print("Log file exists!\n")
+#else: #file does not exist
+#    print("Downloading log file now!\n")
+ #   urllib.request.urlretrieve(log_url, 'logfile.txt')
     
-SELECT a.cs-uri-stem, COUNT(*) as total-requests, b.all-requests
-FROM long_running_pages AS a
-JOIN all_pages_grouped b ON ( a.cs-uri-stem = b.cs-uri-stem)
-GROUP BY a.cs-uri-stem
+#1?
+#SELECT a.cs-uri-stem, COUNT(*) as total-requests, b.all-requests
+#FROM long_running_pages AS a
+#JOIN all_pages_grouped b ON ( a.cs-uri-stem = b.cs-uri-stem)
+#GROUP BY a.cs-uri-stem
  
  #new new
 
@@ -81,6 +82,24 @@ for line in data:
     except:
         continue
 		
+#5
+clean_log=[]
+
+for line in logfile:
+    try:
+        # copy the URLS to an empty list.
+        # We get the part between GET and HTTP
+        clean_log.append(line[line.index("GET")+4:line.index("HTTP")])
+    except:
+        pass
+
+counter = collections.Counter(clean_log)
+
+#get the most popular 
+for count in counter.most_common(1):
+    print(str(count[1]) + "	" + str(count[0]))
+
+logfile.close()
 	
  #ANSWERING #1  
 print('total requests = {}'.format(count)) #for taking the amount of lines in logfile
@@ -94,3 +113,12 @@ print('total requests = {}'.format(count)) #for taking the amount of lines in lo
 #ANSWERING #3 AND #4
 print 'Amount of Sucessful Requests: ', errorcount
 print 'Amount of Unsucessful Requests: ', newcount
+
+#IMPORTING TO CSV
+import csv
+
+result = {}
+with open('output.csv', 'w') as csvfile:
+    csvwriter = csv.writer(csvfile)
+    for row in result.items():
+        csvwriter.writerow(row)
